@@ -15,7 +15,7 @@ COLOR_MY_MSG = "#1D4ED8"
 class ChatGUI:
     def __init__(self, master):
         self.master = master
-        self.master.title("Python Secure Messenger")
+        self.master.title("Python Messenger")
         self.master.geometry("900x650")
         
         self.setup_attributes()
