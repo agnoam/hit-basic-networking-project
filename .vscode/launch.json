@@ -11,7 +11,7 @@
             "name": "Launch Client",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/client.py",
+            "program": "src/gui_client.py",
             "console": "integratedTerminal"
         }
     ]
