@@ -1,12 +1,8 @@
 import socket
 import threading
 import argparse
-import select
-import sys
 
 from constants import MESSAGE_SIZE_IN_BYTES
-
-shutdown_event = threading.Event()
 
 def process_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Chat Client')
@@ -24,15 +20,8 @@ def receive_messages(client_socket: socket.socket) -> None:
             data = client_socket.recv(MESSAGE_SIZE_IN_BYTES)
             if not data:
                 break
-            message = data.decode().strip()
-            print(message)
-            
-            if message == "SERVER_SHUTTING_DOWN":
-                print("Server is shutting down. Disconnecting...")
-                shutdown_event.set()
-                break
+            print(data.decode())
         except:
-            shutdown_event.set()
             break
 
 
@@ -57,13 +46,11 @@ def main() -> None:
     receive_thread.start()
     
     try:
-        while not shutdown_event.is_set():
-            ready, _, _ = select.select([sys.stdin], [], [], 0.1)
-            if ready:
-                message = sys.stdin.readline().strip()
-                if message.lower() == 'quit':
-                    break
-                client_socket.sendall(message.encode())
+        while True:
+            message = input()
+            if message.lower() == 'quit':
+                break
+            client_socket.sendall(message.encode())
     except KeyboardInterrupt:
         print("================")
         print("Disconnecting...")
