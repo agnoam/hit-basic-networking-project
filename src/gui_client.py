@@ -18,47 +18,90 @@ class ChatGUI:
         self.master.title("Python Secure Messenger")
         self.master.geometry("900x650")
         
+        self.setup_attributes()
+        self.create_sidebar()
+        self.create_main_frame()
+        self.create_header()
+        self.create_chat_area()
+        self.create_input_area()
+        
+        self.master.after(100, self.ask_name)
+
+    def setup_attributes(self):
         self.name = ""
         self.client_socket = None
-        self.current_chat_target = "Group Chat"        
+        self.current_chat_target = "Group Chat"
         self.chat_histories = {"Group Chat": []}
 
-        self.sidebar = tk.Frame(master, bg=COLOR_SIDEBAR, width=250)
+    def create_sidebar(self):
+        self.sidebar = tk.Frame(self.master, bg=COLOR_SIDEBAR, width=250)
         self.sidebar.pack(side=tk.LEFT, fill=tk.Y)
         self.sidebar.pack_propagate(False)
         
-        tk.Label(self.sidebar, text="MESSAGES", font=("Arial", 10, "bold"), 
-                 bg=COLOR_SIDEBAR, fg="#9CA3AF").pack(pady=(20, 10), padx=20, anchor="w")
+        tk.Label(
+            self.sidebar, 
+            text="MESSAGES", 
+            font=("Arial", 10, "bold"), 
+            bg=COLOR_SIDEBAR, 
+            fg="#9CA3AF"
+        ).pack(pady=(20, 10), padx=20, anchor="w")
         
-        self.user_listbox = tk.Listbox(self.sidebar, bd=0, font=("Arial", 11), 
-                                      bg=COLOR_SIDEBAR, fg="#F3F4F6", 
-                                      selectbackground="#374151", highlightthickness=0)
+        self.user_listbox = tk.Listbox(
+            self.sidebar, 
+            bd=0, 
+            font=("Arial", 11), 
+            bg=COLOR_SIDEBAR, 
+            fg="#F3F4F6", 
+            selectbackground="#374151", 
+            highlightthickness=0
+        )
+        
         self.user_listbox.pack(fill=tk.BOTH, expand=True, padx=10)
         self.user_listbox.bind("<<ListboxSelect>>", self.on_user_select)
 
-        self.main_frame = tk.Frame(master, bg=COLOR_BG)
+    def create_main_frame(self):
+        self.main_frame = tk.Frame(self.master, bg=COLOR_BG)
         self.main_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
+    def create_header(self):
         self.header = tk.Frame(self.main_frame, bg=COLOR_HEADER, height=70)
         self.header.pack(fill=tk.X)
         
-        self.chat_title_label = tk.Label(self.header, text="Group Chat", font=("Arial", 14, "bold"), 
-                                        bg=COLOR_HEADER, fg="#111827")
+        self.chat_title_label = tk.Label(
+            self.header, 
+            text="Group Chat", 
+            font=("Arial", 14, "bold"), 
+            bg=COLOR_HEADER, 
+            fg="#111827"
+        )
+
         self.chat_title_label.pack(side=tk.LEFT, padx=25, pady=20)
-        
-        self.self_name_label = tk.Label(self.header, text="", font=("Arial", 10), 
-                                      bg=COLOR_HEADER, fg="#6B7280")
+        self.self_name_label = tk.Label(
+            self.header, 
+            text="", 
+            font=("Arial", 10), 
+            bg=COLOR_HEADER, 
+            fg="#6B7280"
+        )
         self.self_name_label.pack(side=tk.RIGHT, padx=25)
 
-        self.chat_area = scrolledtext.ScrolledText(self.main_frame, state='disabled', 
-                                                  font=("Arial", 11), bg="white", 
-                                                  relief=tk.FLAT, padx=20, pady=20)
-        self.chat_area.pack(padx=25, pady=10, fill=tk.BOTH, expand=True)
+    def create_chat_area(self):
+        self.chat_area = scrolledtext.ScrolledText(
+            self.main_frame, 
+            state='disabled', 
+            font=("Arial", 11), 
+            bg="white", 
+            relief=tk.FLAT, 
+            padx=20, 
+            pady=20
+        )
         
+        self.chat_area.pack(padx=25, pady=10, fill=tk.BOTH, expand=True)
         self.chat_area.tag_config("me", foreground=COLOR_MY_MSG, font=("Arial", 11, "bold"))
         self.chat_area.tag_config("system", foreground="#9CA3AF", font=("Arial", 10, "italic"))
         self.chat_area.tag_config("private", foreground="#9333EA", font=("Arial", 11, "bold"))
 
+    def create_input_area(self):
         self.entry_frame = tk.Frame(self.main_frame, bg=COLOR_BG)
         self.entry_frame.pack(fill=tk.X, padx=25, pady=20)
         
@@ -66,12 +109,17 @@ class ChatGUI:
         self.msg_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=10, padx=(0, 10))
         self.msg_entry.bind("<Return>", lambda e: self.send_message())
 
-        self.send_btn = tk.Button(self.entry_frame, text="Send", font=("Arial", 11, "bold"), 
-                                 bg=COLOR_PRIMARY, fg="white", relief=tk.FLAT, 
-                                 command=self.send_message, padx=25)
+        self.send_btn = tk.Button(
+            self.entry_frame, 
+            text="Send", 
+            font=("Arial", 11, "bold"), 
+            bg=COLOR_PRIMARY, 
+            fg="white", 
+            relief=tk.FLAT, 
+            command=self.send_message, 
+            padx=25
+        )
         self.send_btn.pack(side=tk.RIGHT)
-
-        self.master.after(100, self.ask_name)
 
     def ask_name(self):
         name = simpledialog.askstring("Login", "Enter your name:")
@@ -79,17 +127,18 @@ class ChatGUI:
             self.name = name.strip()
             self.self_name_label.config(text=f"Logged in as: {self.name}")
             self.connect_to_server()
-        else: self.master.destroy()
+        else: 
+            self.master.destroy()
 
     def connect_to_server(self):
         try:
             self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client_socket.connect(('localhost', 12345))
-            # קבלת ID ושליחת פרטים
+            
             id_data = self.client_socket.recv(MESSAGE_SIZE_IN_BYTES).decode().split("\n")[0]
             self.client_socket.sendall(f"{id_data}:{self.name}".encode())
             threading.Thread(target=self.receive_messages, daemon=True).start()
-        except:
+        except Exception as _:
             messagebox.showerror("Error", "Server not found.")
             self.master.destroy()
 
@@ -98,12 +147,16 @@ class ChatGUI:
         while True:
             try:
                 data = self.client_socket.recv(MESSAGE_SIZE_IN_BYTES).decode()
-                if not data: break
+                if not data: 
+                    break
+
                 buffer += data
                 while "\n" in buffer:
                     line, buffer = buffer.split("\n", 1)
-                    if line: self.process_line(line)
-            except: break
+                    if line: 
+                        self.process_line(line)
+            except Exception as _: 
+                break
 
     def process_line(self, data):
         if data.startswith("USER_LIST:"):
