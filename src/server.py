@@ -3,6 +3,7 @@ import threading
 import argparse
 import signal
 import sys
+
 from constants import MESSAGE_SIZE_IN_BYTES
 
 clients = []
@@ -36,11 +37,10 @@ def shutdown_server():
     broadcast("SYSTEM: SERVER_SHUTTING_DOWN")
     running = False
     for sock, _, _ in clients:
-        try: 
+        try:
             sock.close()
         except Exception as _: 
             pass
-
     clients.clear()
 
 def signal_handler(signum, frame):
@@ -56,7 +56,7 @@ def listen_for_exit():
         except EOFError: 
             break
 
-def handle_single_client(client_socket, client_address):
+def handle_client(client_socket, client_address):
     global client_counter
     try:
         client_id = client_counter
@@ -77,11 +77,13 @@ def handle_single_client(client_socket, client_address):
             
             message = data.decode().strip()
             if message.startswith("/msg "):
-                parts = message.split(" ", 2)
-                if len(parts) >= 3:
-                    target, content = parts[1], parts[2]
+                rest = message[5:]
+                if ":" in rest:
+                    username, content = rest.split(":", 1)
+                    username = username.strip()
+                    content = content.strip()
                     for sock, _, n in clients:
-                        if n == target:
+                        if n == username:
                             sock.sendall(f"PRIVATE from {name}: {content}\n".encode())
                             break
             else:
@@ -106,7 +108,7 @@ def main():
     server.bind(('localhost', args.port))
     server.listen(5)
     server.settimeout(1.0)
-    
+
     signal.signal(signal.SIGINT, signal_handler)
     threading.Thread(target=listen_for_exit, daemon=True).start()
 
@@ -114,14 +116,9 @@ def main():
     while running:
         try:
             conn, addr = server.accept()
-            threading.Thread(
-                target=handle_single_client, 
-                args=(conn, addr),
-                daemon=True
-            ).start()
+            threading.Thread(target=handle_client, args=(conn, addr), daemon=True).start()
         except socket.timeout: 
             continue
-    
     server.close()
 
 if __name__ == "__main__":
