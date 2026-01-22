@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "Launch Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/server.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Launch Client",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/client.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}
