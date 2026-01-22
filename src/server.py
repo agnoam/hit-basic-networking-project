@@ -20,7 +20,7 @@ def broadcast(message, sender_socket=None):
         if client_socket != sender_socket:
             try:
                 client_socket.sendall(message.encode())
-            except:
+            except Exception as _:
                 # If sending fails, the client might have disconnected
                 remove_client(client_socket)
 
@@ -43,6 +43,7 @@ def signal_handler(signum, frame):
     global running
     print("=======================")
     print("Shutting down server...")
+    broadcast("SERVER_SHUTTING_DOWN")
     running = False
 
 def handle_client(client_socket: socket.socket, client_address):
@@ -75,7 +76,7 @@ def handle_client(client_socket: socket.socket, client_address):
                 full_message = f"[{id_str}]: {name} - {message}"
                 print(full_message)
                 broadcast(full_message, client_socket)
-    except:
+    except Exception as _:
         pass
     finally:
         remove_client(client_socket)
