@@ -1,0 +1,21 @@
+msg_id,app_protocol,src_app,dst_app,src_port,dst_port,message,timestamp
+1,HTTP,browser_client,web_server,54321,80,GET /index.html HTTP/1.1,0.015
+2,HTTP,web_server,browser_client,80,54321,HTTP/1.1 200 OK,0.03
+3,HTTP,browser_client,web_server,54321,80,GET /style.css HTTP/1.1,0.045
+4,HTTP,web_server,browser_client,80,54321,HTTP/1.1 200 OK,0.06
+5,HTTP,browser_client,web_server,54321,80,GET /logo.png HTTP/1.1,0.075
+6,HTTP,web_server,browser_client,80,54321,HTTP/1.1 200 OK,0.09
+7,HTTP,browser_client,web_server,54321,80,GET /script.js HTTP/1.1,0.105
+8,HTTP,web_server,browser_client,80,54321,HTTP/1.1 200 OK,0.12
+9,HTTP,browser_client,web_server,54321,80,GET /favicon.ico HTTP/1.1,0.135
+10,HTTP,web_server,browser_client,80,54321,HTTP/1.1 404 Not Found,0.15
+11,HTTP,browser_client,web_server,54321,80,POST /login HTTP/1.1,0.165
+12,HTTP,web_server,browser_client,80,54321,HTTP/1.1 302 Found,0.18
+13,HTTP,browser_client,web_server,54321,80,GET /dashboard HTTP/1.1,0.195
+14,HTTP,web_server,browser_client,80,54321,HTTP/1.1 200 OK,0.21
+15,HTTP,browser_client,web_server,54321,80,GET /api/data HTTP/1.1,0.225
+16,HTTP,web_server,browser_client,80,54321,HTTP/1.1 200 OK,0.24
+17,HTTP,browser_client,web_server,54321,80,GET /image1.jpg HTTP/1.1,0.255
+18,HTTP,web_server,browser_client,80,54321,HTTP/1.1 200 OK,0.27
+19,HTTP,browser_client,web_server,54321,80,GET /image2.jpg HTTP/1.1,0.285
+20,HTTP,web_server,browser_client,80,54321,HTTP/1.1 200 OK,0.3
